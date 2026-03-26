@@ -1,6 +1,50 @@
 import { type Plugin, tool } from "@opencode-ai/plugin"
 
 /**
+ * Event types for OpenCode plugin system
+ * Based on OpenCode SDK event structure
+ */
+interface EventSessionStatus {
+  type: "session.status"
+  properties: {
+    sessionID: string
+    status: 
+      | { type: "idle" }
+      | { type: "busy" }
+      | { type: "retry"; attempt?: number; message?: string; next?: number }
+  }
+}
+
+interface EventSessionCreated {
+  type: "session.created"
+  properties: {
+    sessionID?: string
+    info: {
+      id: string
+      createdAt: string
+      updatedAt: string
+    }
+  }
+}
+
+interface EventSessionIdle {
+  type: "session.idle"
+  properties: {
+    sessionID: string
+  }
+}
+
+interface EventSessionError {
+  type: "session.error"
+  properties: {
+    sessionID?: string
+    error?: Error | { message: string; code?: string; [key: string]: unknown }
+  }
+}
+
+type PluginEvent = EventSessionStatus | EventSessionCreated | EventSessionIdle | EventSessionError
+
+/**
  * OpenCode plugin for WorkTrunk integration
  * 
  * Tracks OpenCode session state and updates WorkTrunk status markers:
@@ -13,6 +57,7 @@ const plugin: Plugin = async ({ project, client, $, directory, worktree }) => {
   let currentBranch: string | null = null
   let statusTimer: ReturnType<typeof setTimeout> | null = null
   let branchCheckInterval: ReturnType<typeof setInterval> | null = null
+  let initTimer: ReturnType<typeof setTimeout> | null = null
   let lastKnownBranch: string | null = null
 
   // Performance optimization: Cache WorkTrunk installation check
@@ -135,11 +180,27 @@ const plugin: Plugin = async ({ project, client, $, directory, worktree }) => {
     }
   }
 
+  // Cleanup function to prevent memory leaks
+  const cleanup = () => {
+    if (statusTimer) {
+      clearTimeout(statusTimer)
+      statusTimer = null
+    }
+    if (branchCheckInterval) {
+      clearInterval(branchCheckInterval)
+      branchCheckInterval = null
+    }
+    if (initTimer) {
+      clearTimeout(initTimer)
+      initTimer = null
+    }
+  }
+
   // Initialize lazily - don't block startup with git/wt commands
   // Branch detection will happen on first status update
   
   // Use setImmediate to defer initialization after plugin loads
-  setTimeout(async () => {
+  initTimer = setTimeout(async () => {
     try {
       currentBranch = await getCurrentBranch()
       lastKnownBranch = currentBranch
@@ -148,8 +209,17 @@ const plugin: Plugin = async ({ project, client, $, directory, worktree }) => {
       // Check every 2 seconds for branch changes (e.g., manual git checkout)
       if (currentBranch) {
         branchCheckInterval = setInterval(() => {
-          checkBranchChange().catch(() => {
-            // Silently handle errors in background check
+          checkBranchChange().catch((error) => {
+            // Log errors in background check for debugging
+            client.app.log({
+              body: {
+                service: "opencode-worktrunk",
+                level: "debug",
+                message: `Branch change check failed: ${error}`,
+              },
+            }).catch(() => {
+              // Silently fail if logging fails
+            })
           })
         }, 2000)
       }
@@ -178,13 +248,15 @@ const plugin: Plugin = async ({ project, client, $, directory, worktree }) => {
     event: async ({ event }) => {
       switch (event.type) {
         case "session.status": {
-          // event.status contains the current status
-          const status = (event as any).status
-          if (status === "working" || status === "thinking") {
+          // event.properties.status contains the current status
+          const statusEvent = event as EventSessionStatus
+          const statusType = statusEvent.properties.status.type
+          if (statusType === "busy") {
             updateStatus("🤖")
-          } else if (status === "waiting" || status === "idle") {
+          } else if (statusType === "idle") {
             updateStatus("💬")
           } else {
+            // For "retry" or any other status, clear marker
             updateStatus(null)
           }
           break
@@ -209,6 +281,9 @@ const plugin: Plugin = async ({ project, client, $, directory, worktree }) => {
         }
       }
     },
+
+    // Cleanup method for memory management
+    cleanup,
 
     // Custom tools for WorkTrunk operations
     tool: {
@@ -366,6 +441,13 @@ The plugin automatically manages status markers, but this tool allows manual con
               }
             }
             
+            // Validate branch exists before updating marker
+            try {
+              await $`wt list --branch ${targetBranch}`.quiet()
+            } catch (error) {
+              return `Error: Branch '${targetBranch}' not found. Use 'worktrunk-list' to see available branches.`
+            }
+            
             // Update the marker directly using wt command
             const markerValue = args.marker || ""
             await $`wt config state marker set "${markerValue}" --branch ${targetBranch}`.quiet()
@@ -413,7 +495,7 @@ Use this when starting work on a new feature branch.`,
           }
           
           // Validate branch name
-          if (args.branch && !/^[@\w\/\-\.]+$/.test(args.branch) && args.branch !== "@") {
+          if (args.branch && !/^[\@\w\/\-\.]+$/.test(args.branch) && args.branch !== "@") {
             return `Error: Invalid branch name '${args.branch}'. Branch names should only contain letters, numbers, slashes, hyphens, dots, or '@' for current branch.`
           }
           

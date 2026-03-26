@@ -129,8 +129,15 @@ describe("WorkTrunk Plugin - Edge Cases and Error Scenarios", () => {
       const pluginModule = await import("../index.ts")
       const WorkTrunkPlugin = pluginModule.default
       
+      let callCount = 0
       const mockShell = {
         quiet: () => {
+          callCount++
+          if (callCount === 1) {
+            // First call is wt --version (succeeds)
+            return Promise.resolve({ stdout: Buffer.from("wt version 1.0.0") })
+          }
+          // Second call is wt remove (fails)
           throw new Error("Worktree 'nonexistent' not found")
         },
       }
@@ -154,6 +161,7 @@ describe("WorkTrunk Plugin - Edge Cases and Error Scenarios", () => {
       expect(result).toContain("Error")
       expect(result).toContain("not found")
     })
+
   })
 
   describe("Detached HEAD state", () => {
@@ -239,32 +247,41 @@ describe("WorkTrunk Plugin - Edge Cases and Error Scenarios", () => {
     test("worktrunk-status-update handles branch not found", async () => {
       const pluginModule = await import("../index.ts")
       const WorkTrunkPlugin = pluginModule.default
-      
-      let callCount = 0
-      const mockShell = {
-        quiet: () => {
-          callCount++
-          if (callCount === 1) {
-            // wt --version succeeds
-            return Promise.resolve({ stdout: Buffer.from("") })
-          }
-          if (callCount === 2) {
-            // git rev-parse fails (no branch)
-            throw new Error("fatal: not a git repository")
-          }
-          // wt config state marker set fails
+
+      let wtListCalled = false
+      let wtListBranch: string | null = null
+      let markerSetCalled = false
+
+      const mock$ = ((strings: TemplateStringsArray, ...values: any[]) => {
+        const cmd = strings.join("")
+
+        if (cmd.includes("wt --version")) {
+          return {
+            quiet: () => Promise.resolve({ stdout: Buffer.from("wt 1.0.0") }),
+          } as any
+        }
+
+        if (cmd.includes("wt list --branch")) {
+          wtListCalled = true
+          wtListBranch = values[0] as string
+          // Simulate branch not found error
           throw new Error("Branch 'nonexistent' not found")
-        },
-      }
-      
+        }
+
+        if (cmd.includes("wt config state marker set")) {
+          markerSetCalled = true
+          return {
+            quiet: () => Promise.resolve({ stdout: Buffer.from("") }),
+          } as any
+        }
+
+        return {
+          quiet: () => Promise.resolve({ stdout: Buffer.from("") }),
+        } as any
+      }) as any
+
       const mockContext: Partial<PluginContext> = {
-        $: ((strings: TemplateStringsArray, ...values: any[]) => {
-          const cmd = strings.join("")
-          if (cmd.includes("wt --version")) {
-            return { quiet: () => Promise.resolve({ stdout: Buffer.from("") }) } as any
-          }
-          return mockShell as any
-        }) as any,
+        $: mock$,
         client: {
           app: {
             log: async () => {},
@@ -277,9 +294,19 @@ describe("WorkTrunk Plugin - Edge Cases and Error Scenarios", () => {
 
       const plugin = await WorkTrunkPlugin(mockContext as PluginContext)
       const updateTool = plugin.tool["worktrunk-status-update"]
-      
+
       const result = await updateTool.execute({ marker: "🤖", branch: "nonexistent" }, {} as any)
+
+      // Verify wt list --branch was called to validate the branch
+      expect(wtListCalled).toBe(true)
+      expect(wtListBranch).toBe("nonexistent")
+
+      // Verify marker set was NOT called after branch validation failed
+      expect(markerSetCalled).toBe(false)
+
+      // Verify error message
       expect(result).toContain("Error")
+      expect(result).toContain("not found")
     })
   })
 
