@@ -1,2 +1,6 @@
 node_modules/
 dist/
+.beats
+.sisyphus
+# OpenCode Eval results
+results*.json

@@ -53,7 +53,7 @@ type PluginEvent = EventSessionStatus | EventSessionCreated | EventSessionIdle |
  * 
  * Also provides custom tools for WorkTrunk operations.
  */
-const plugin: Plugin = async ({ project, client, $, directory, worktree }) => {
+export const WorkTrunkPlugin: Plugin = async ({ project, client, $, directory, worktree }) => {
   let currentBranch: string | null = null
   let statusTimer: ReturnType<typeof setTimeout> | null = null
   let branchCheckInterval: ReturnType<typeof setInterval> | null = null
@@ -282,18 +282,15 @@ const plugin: Plugin = async ({ project, client, $, directory, worktree }) => {
       }
     },
 
-    // Cleanup method for memory management
-    cleanup,
-
     // Custom tools for WorkTrunk operations
     tool: {
-      "worktrunk-list": tool({
+      worktrunkList: tool({
         description: `List all WorkTrunk worktrees with their status.
 
 Examples:
-- worktrunk-list() - List all worktrees in text format
-- worktrunk-list({format: "json"}) - Get structured JSON output for parsing
-- worktrunk-list({full: true, branches: true}) - Show PR/CI status for all branches including those without worktrees
+- worktrunkList() - List all worktrees in text format
+- worktrunkList({format: "json"}) - Get structured JSON output for parsing
+- worktrunkList({full: true, branches: true}) - Show PR/CI status for all branches including those without worktrees
 
 Use cases:
 - Check what branches have active worktrees
@@ -333,13 +330,13 @@ Use cases:
         },
       }),
 
-      "worktrunk-switch": tool({
+      worktrunkSwitch: tool({
         description: `Switch to a different WorkTrunk worktree/branch.
 
 Examples:
-- worktrunk-switch({branch: "feature/api"}) - Switch to feature/api branch
-- worktrunk-switch({branch: "@"}) - Switch to current branch (refresh)
-- worktrunk-switch({branch: "-"}) - Switch to previous worktree
+- worktrunkSwitch({branch: "feature/api"}) - Switch to feature/api branch
+- worktrunkSwitch({branch: "@"}) - Switch to current branch (refresh)
+- worktrunkSwitch({branch: "-"}) - Switch to previous worktree
 
 Shortcuts:
 - "@" - Current branch (useful for refreshing)
@@ -374,11 +371,11 @@ Use when you need to change context to work on a different branch.`,
         },
       }),
 
-      "worktrunk-status": tool({
+      worktrunkStatus: tool({
         description: `Get current WorkTrunk status for the active branch.
 
 Example:
-- worktrunk-status() - Shows status of the current branch
+- worktrunkStatus() - Shows status of the current branch
 
 Use this to check the current branch's worktree status, including any status markers set by the plugin (🤖 working, 💬 waiting).`,
         args: {},
@@ -405,14 +402,14 @@ Use this to check the current branch's worktree status, including any status mar
         },
       }),
 
-      "worktrunk-status-update": tool({
+      worktrunkStatusUpdate: tool({
         description: `Manually update WorkTrunk status marker for the current branch.
 
 Examples:
-- worktrunk-status-update({marker: "🤖"}) - Set working marker
-- worktrunk-status-update({marker: "💬"}) - Set waiting marker
-- worktrunk-status-update({marker: ""}) - Clear marker
-- worktrunk-status-update({marker: "🚧", branch: "feature/x"}) - Update specific branch
+- worktrunkStatusUpdate({marker: "🤖"}) - Set working marker
+- worktrunkStatusUpdate({marker: "💬"}) - Set waiting marker
+- worktrunkStatusUpdate({marker: ""}) - Clear marker
+- worktrunkStatusUpdate({marker: "🚧", branch: "feature/x"}) - Update specific branch
 
 Use cases:
 - Explicit status changes when automatic tracking misses updates
@@ -445,7 +442,7 @@ The plugin automatically manages status markers, but this tool allows manual con
             try {
               await $`wt list --branch ${targetBranch}`.quiet()
             } catch (error) {
-              return `Error: Branch '${targetBranch}' not found. Use 'worktrunk-list' to see available branches.`
+              return `Error: Branch '${targetBranch}' not found. Use 'worktrunkList' to see available branches.`
             }
             
             // Update the marker directly using wt command
@@ -467,14 +464,14 @@ The plugin automatically manages status markers, but this tool allows manual con
         },
       }),
 
-      "worktrunk-create": tool({
+      worktrunkCreate: tool({
         description: `Create a new WorkTrunk worktree for a branch.
 
 Examples:
-- worktrunk-create({branch: "feature/new-feature"}) - Create worktree from default branch
-- worktrunk-create({branch: "feature/part2", base: "@"}) - Create stacked branch from current HEAD
-- worktrunk-create({branch: "feature/part2", base: "feature/part1"}) - Create stacked branch from another branch
-- worktrunk-create({branch: "@"}) - Create worktree for current branch
+- worktrunkCreate({branch: "feature/new-feature"}) - Create worktree from default branch
+- worktrunkCreate({branch: "feature/part2", base: "@"}) - Create stacked branch from current HEAD
+- worktrunkCreate({branch: "feature/part2", base: "feature/part1"}) - Create stacked branch from another branch
+- worktrunkCreate({branch: "@"}) - Create worktree for current branch
 
 Stacked branches:
 - Use base: "@" to branch from current HEAD (enables incremental feature development)
@@ -518,19 +515,19 @@ Use this when starting work on a new feature branch.`,
           } catch (error) {
             const errorMsg = error instanceof Error ? error.message : String(error)
             if (errorMsg.includes("already exists")) {
-              return `Error: Branch '${args.branch}' already exists. Use worktrunk-switch to switch to it, or choose a different name.`
+              return `Error: Branch '${args.branch}' already exists. Use worktrunkSwitch to switch to it, or choose a different name.`
             }
             return `Error creating worktree for branch '${args.branch}': ${errorMsg}`
           }
         },
       }),
 
-      "worktrunk-remove": tool({
+      worktrunkRemove: tool({
         description: `Remove a WorkTrunk worktree.
 
 Examples:
-- worktrunk-remove({branch: "feature/old"}) - Remove worktree for feature/old
-- worktrunk-remove({branch: "@"}) - Remove current worktree
+- worktrunkRemove({branch: "feature/old"}) - Remove worktree for feature/old
+- worktrunkRemove({branch: "@"}) - Remove current worktree
 
 Shortcuts:
 - "@" - Current worktree
@@ -561,22 +558,22 @@ Use this to clean up worktrees when you're done with a branch. The plugin will a
           } catch (error) {
             const errorMsg = error instanceof Error ? error.message : String(error)
             if (errorMsg.includes("not found") || errorMsg.includes("does not exist")) {
-              return `Error: Worktree '${args.branch}' not found. Use 'worktrunk-list' to see available worktrees.`
+              return `Error: Worktree '${args.branch}' not found. Use 'worktrunkList' to see available worktrees.`
             }
             return `Error removing worktree '${args.branch}': ${errorMsg}`
           }
         },
       }),
 
-      "worktrunk-default-branch": tool({
+      worktrunkDefaultBranch: tool({
         description: `Get the default branch name dynamically.
 
 Example:
-- worktrunk-default-branch() - Returns "main" or "master" or other default
+- worktrunkDefaultBranch() - Returns "main" or "master" or other default
 
 Use cases:
 - Scripts that need to work on any repo (main/master agnostic)
-- Switching to default branch: worktrunk-switch({branch: <default>})
+- Switching to default branch: worktrunkSwitch({branch: <default>})
 - Comparing against default branch
 
 This tool works regardless of whether the default is 'main', 'master', or any other name.`,
@@ -600,4 +597,5 @@ This tool works regardless of whether the default is 'main', 'master', or any ot
   }
 }
 
-export default plugin
+// Also export as default for compatibility
+export default WorkTrunkPlugin

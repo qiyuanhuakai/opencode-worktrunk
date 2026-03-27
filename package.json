@@ -1,17 +1,15 @@
 {
-  "name": "opencode-worktrunk",
-  "version": "1.0.0",
+  "name": "@qiyuanhuakai/opencode-worktrunk",
+  "version": "0.0.1",
   "description": "OpenCode plugin for WorkTrunk integration - tracks session state and updates status markers",
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./index.ts",
   "files": [
-    "dist"
+    "index.ts",
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
-    "build": "tsc",
-    "clean": "rm -rf dist",
-    "prepublishOnly": "npm run build",
     "test": "bun test",
     "eval": "opencode-eval run evals/",
     "eval:dry": "opencode-eval run evals/ --dry-run"

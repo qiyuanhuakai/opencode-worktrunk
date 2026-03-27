@@ -5,7 +5,7 @@ describe("WorkTrunk Plugin - Edge Cases and Error Scenarios", () => {
   describe("WorkTrunk not installed", () => {
     test("tools handle WorkTrunk not installed gracefully", async () => {
       const pluginModule = await import("../index.ts")
-      const WorkTrunkPlugin = pluginModule.default
+      const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
       
       // Mock wt --version to fail (WorkTrunk not installed)
       const mockShell = {
@@ -27,7 +27,7 @@ describe("WorkTrunk Plugin - Edge Cases and Error Scenarios", () => {
       }
 
       const plugin = await WorkTrunkPlugin(mockContext as PluginContext)
-      const listTool = plugin.tool["worktrunk-list"]
+      const listTool = plugin.tool.worktrunkList
       
       const result = await listTool.execute({}, {} as any)
       expect(result).toContain("Error")
@@ -38,7 +38,7 @@ describe("WorkTrunk Plugin - Edge Cases and Error Scenarios", () => {
   describe("Invalid branch names", () => {
     test("worktrunk-create rejects invalid branch names", async () => {
       const pluginModule = await import("../index.ts")
-      const WorkTrunkPlugin = pluginModule.default
+      const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
       
       const mockShell = {
         quiet: () => Promise.resolve({ stdout: Buffer.from("") }),
@@ -57,7 +57,7 @@ describe("WorkTrunk Plugin - Edge Cases and Error Scenarios", () => {
       }
 
       const plugin = await WorkTrunkPlugin(mockContext as PluginContext)
-      const createTool = plugin.tool["worktrunk-create"]
+      const createTool = plugin.tool.worktrunkCreate
       
       // Test with invalid branch name containing spaces
       const result = await createTool.execute({ branch: "invalid branch name" }, {} as any)
@@ -67,7 +67,7 @@ describe("WorkTrunk Plugin - Edge Cases and Error Scenarios", () => {
 
     test("worktrunk-create rejects branch names with special characters", async () => {
       const pluginModule = await import("../index.ts")
-      const WorkTrunkPlugin = pluginModule.default
+      const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
       
       const mockShell = {
         quiet: () => Promise.resolve({ stdout: Buffer.from("") }),
@@ -86,7 +86,7 @@ describe("WorkTrunk Plugin - Edge Cases and Error Scenarios", () => {
       }
 
       const plugin = await WorkTrunkPlugin(mockContext as PluginContext)
-      const createTool = plugin.tool["worktrunk-create"]
+      const createTool = plugin.tool.worktrunkCreate
       
       // Test with invalid characters
       const result = await createTool.execute({ branch: "branch@#$%^" }, {} as any)
@@ -98,7 +98,7 @@ describe("WorkTrunk Plugin - Edge Cases and Error Scenarios", () => {
   describe("Non-existent branches", () => {
     test("worktrunk-switch handles non-existent branch gracefully", async () => {
       const pluginModule = await import("../index.ts")
-      const WorkTrunkPlugin = pluginModule.default
+      const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
       
       const mockShell = {
         quiet: () => {
@@ -119,7 +119,7 @@ describe("WorkTrunk Plugin - Edge Cases and Error Scenarios", () => {
       }
 
       const plugin = await WorkTrunkPlugin(mockContext as PluginContext)
-      const switchTool = plugin.tool["worktrunk-switch"]
+      const switchTool = plugin.tool.worktrunkSwitch
       
       const result = await switchTool.execute({ branch: "nonexistent" }, {} as any)
       expect(result).toContain("Error")
@@ -127,7 +127,7 @@ describe("WorkTrunk Plugin - Edge Cases and Error Scenarios", () => {
 
     test("worktrunk-remove handles non-existent worktree gracefully", async () => {
       const pluginModule = await import("../index.ts")
-      const WorkTrunkPlugin = pluginModule.default
+      const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
       
       let callCount = 0
       const mockShell = {
@@ -155,7 +155,7 @@ describe("WorkTrunk Plugin - Edge Cases and Error Scenarios", () => {
       }
 
       const plugin = await WorkTrunkPlugin(mockContext as PluginContext)
-      const removeTool = plugin.tool["worktrunk-remove"]
+      const removeTool = plugin.tool.worktrunkRemove
       
       const result = await removeTool.execute({ branch: "nonexistent" }, {} as any)
       expect(result).toContain("Error")
@@ -167,7 +167,7 @@ describe("WorkTrunk Plugin - Edge Cases and Error Scenarios", () => {
   describe("Detached HEAD state", () => {
     test("worktrunk-status handles detached HEAD gracefully", async () => {
       const pluginModule = await import("../index.ts")
-      const WorkTrunkPlugin = pluginModule.default
+      const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
       
       // Mock git rev-parse to return empty (detached HEAD)
       const mockShell = {
@@ -200,7 +200,7 @@ describe("WorkTrunk Plugin - Edge Cases and Error Scenarios", () => {
       }
 
       const plugin = await WorkTrunkPlugin(mockContext as PluginContext)
-      const statusTool = plugin.tool["worktrunk-status"]
+      const statusTool = plugin.tool.worktrunkStatus
       
       const result = await statusTool.execute({}, {} as any)
       // Should handle gracefully - either return error message or handle detached HEAD
@@ -211,7 +211,7 @@ describe("WorkTrunk Plugin - Edge Cases and Error Scenarios", () => {
   describe("Error recovery scenarios", () => {
     test("worktrunk-list recovers from temporary WorkTrunk errors", async () => {
       const pluginModule = await import("../index.ts")
-      const WorkTrunkPlugin = pluginModule.default
+      const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
       
       let attemptCount = 0
       const mockShell = {
@@ -237,7 +237,7 @@ describe("WorkTrunk Plugin - Edge Cases and Error Scenarios", () => {
       }
 
       const plugin = await WorkTrunkPlugin(mockContext as PluginContext)
-      const listTool = plugin.tool["worktrunk-list"]
+      const listTool = plugin.tool.worktrunkList
       
       // First call should fail, but tool should return error message
       const result = await listTool.execute({}, {} as any)
@@ -246,7 +246,7 @@ describe("WorkTrunk Plugin - Edge Cases and Error Scenarios", () => {
 
     test("worktrunk-status-update handles branch not found", async () => {
       const pluginModule = await import("../index.ts")
-      const WorkTrunkPlugin = pluginModule.default
+      const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
 
       let wtListCalled = false
       let wtListBranch: string | null = null
@@ -293,7 +293,7 @@ describe("WorkTrunk Plugin - Edge Cases and Error Scenarios", () => {
       }
 
       const plugin = await WorkTrunkPlugin(mockContext as PluginContext)
-      const updateTool = plugin.tool["worktrunk-status-update"]
+      const updateTool = plugin.tool.worktrunkStatusUpdate
 
       const result = await updateTool.execute({ marker: "🤖", branch: "nonexistent" }, {} as any)
 
@@ -313,7 +313,7 @@ describe("WorkTrunk Plugin - Edge Cases and Error Scenarios", () => {
   describe("Complex workflows", () => {
     test("worktrunk-create with base handles invalid base branch", async () => {
       const pluginModule = await import("../index.ts")
-      const WorkTrunkPlugin = pluginModule.default
+      const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
       
       const mockShell = {
         quiet: () => {
@@ -334,7 +334,7 @@ describe("WorkTrunk Plugin - Edge Cases and Error Scenarios", () => {
       }
 
       const plugin = await WorkTrunkPlugin(mockContext as PluginContext)
-      const createTool = plugin.tool["worktrunk-create"]
+      const createTool = plugin.tool.worktrunkCreate
       
       const result = await createTool.execute({ 
         branch: "feature/new", 
@@ -345,7 +345,7 @@ describe("WorkTrunk Plugin - Edge Cases and Error Scenarios", () => {
 
     test("worktrunk-switch with @ shortcut handles current branch detection failure", async () => {
       const pluginModule = await import("../index.ts")
-      const WorkTrunkPlugin = pluginModule.default
+      const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
       
       let callCount = 0
       const mockShell = {
@@ -379,7 +379,7 @@ describe("WorkTrunk Plugin - Edge Cases and Error Scenarios", () => {
       }
 
       const plugin = await WorkTrunkPlugin(mockContext as PluginContext)
-      const switchTool = plugin.tool["worktrunk-switch"]
+      const switchTool = plugin.tool.worktrunkSwitch
       
       const result = await switchTool.execute({ branch: "@" }, {} as any)
       // Should handle the error gracefully
