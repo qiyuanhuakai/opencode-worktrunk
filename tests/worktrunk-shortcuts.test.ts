@@ -4,7 +4,7 @@ import type { PluginContext } from "@opencode-ai/plugin"
 describe("WorkTrunk shortcuts support", () => {
   test("worktrunk-switch supports @ shortcut", async () => {
     const pluginModule = await import("../index.ts")
-    const WorkTrunkPlugin = pluginModule.default
+    const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
     
     let switchCommands: string[] = []
     const mockContext: Partial<PluginContext> = {
@@ -33,7 +33,7 @@ describe("WorkTrunk shortcuts support", () => {
     }
 
     const plugin = await WorkTrunkPlugin(mockContext as PluginContext)
-    const switchTool = plugin.tool["worktrunk-switch"]
+    const switchTool = plugin.tool.worktrunkSwitch
     
     const result = await switchTool.execute({ branch: "@" }, {} as any)
     expect(result).toBeDefined()
@@ -44,7 +44,7 @@ describe("WorkTrunk shortcuts support", () => {
 
   test("worktrunk-switch supports - shortcut", async () => {
     const pluginModule = await import("../index.ts")
-    const WorkTrunkPlugin = pluginModule.default
+    const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
     
     let capturedCommand: string[] = []
     const mockContext: Partial<PluginContext> = {
@@ -65,7 +65,7 @@ describe("WorkTrunk shortcuts support", () => {
     }
 
     const plugin = await WorkTrunkPlugin(mockContext as PluginContext)
-    const switchTool = plugin.tool["worktrunk-switch"]
+    const switchTool = plugin.tool.worktrunkSwitch
     
     const result = await switchTool.execute({ branch: "-" }, {} as any)
     expect(result).toBeDefined()
@@ -75,7 +75,7 @@ describe("WorkTrunk shortcuts support", () => {
 
   test("worktrunk-create supports @ shortcut", async () => {
     const pluginModule = await import("../index.ts")
-    const WorkTrunkPlugin = pluginModule.default
+    const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
     
     let capturedCommand: string[] = []
     const mockContext: Partial<PluginContext> = {
@@ -96,7 +96,7 @@ describe("WorkTrunk shortcuts support", () => {
     }
 
     const plugin = await WorkTrunkPlugin(mockContext as PluginContext)
-    const createTool = plugin.tool["worktrunk-create"]
+    const createTool = plugin.tool.worktrunkCreate
     
     const result = await createTool.execute({ branch: "@" }, {} as any)
     expect(result).toBeDefined()
@@ -106,7 +106,7 @@ describe("WorkTrunk shortcuts support", () => {
 
   test("worktrunk-remove tool exists and supports @ shortcut", async () => {
     const pluginModule = await import("../index.ts")
-    const WorkTrunkPlugin = pluginModule.default
+    const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
     
     let capturedCommands: string[][] = []
     const mockContext: Partial<PluginContext> = {
@@ -128,9 +128,9 @@ describe("WorkTrunk shortcuts support", () => {
     }
 
     const plugin = await WorkTrunkPlugin(mockContext as PluginContext)
-    expect(plugin.tool["worktrunk-remove"]).toBeDefined()
+    expect(plugin.tool.worktrunkRemove).toBeDefined()
     
-    const removeTool = plugin.tool["worktrunk-remove"]
+    const removeTool = plugin.tool.worktrunkRemove
     const result = await removeTool.execute({ branch: "@" }, {} as any)
     expect(result).toBeDefined()
     expect(result).toContain("@")
@@ -142,7 +142,7 @@ describe("WorkTrunk shortcuts support", () => {
 
   test("worktrunk-remove supports branch name", async () => {
     const pluginModule = await import("../index.ts")
-    const WorkTrunkPlugin = pluginModule.default
+    const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
     
     let capturedCommand: string[] = []
     const mockContext: Partial<PluginContext> = {
@@ -163,7 +163,7 @@ describe("WorkTrunk shortcuts support", () => {
     }
 
     const plugin = await WorkTrunkPlugin(mockContext as PluginContext)
-    const removeTool = plugin.tool["worktrunk-remove"]
+    const removeTool = plugin.tool.worktrunkRemove
     
     const result = await removeTool.execute({ branch: "feature/test" }, {} as any)
     expect(result).toBeDefined()

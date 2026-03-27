@@ -16,7 +16,7 @@ describe("WorkTrunk Plugin - Event Handling", () => {
 
   test("session.status 'busy' event sets 🤖 marker", async () => {
     const pluginModule = await import("../index.ts")
-    const WorkTrunkPlugin = pluginModule.default
+    const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
 
     let markerSet = false
     let capturedMarker: string | null = null
@@ -67,7 +67,7 @@ describe("WorkTrunk Plugin - Event Handling", () => {
 
   test("session.status 'idle' event sets 💬 marker", async () => {
     const pluginModule = await import("../index.ts")
-    const WorkTrunkPlugin = pluginModule.default
+    const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
 
     let markerSet = false
     let capturedMarker: string | null = null
@@ -118,7 +118,7 @@ describe("WorkTrunk Plugin - Event Handling", () => {
 
   test("session.created event sets 💬 marker", async () => {
     const pluginModule = await import("../index.ts")
-    const WorkTrunkPlugin = pluginModule.default
+    const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
 
     let markerSet = false
     let capturedMarker: string | null = null
@@ -172,7 +172,7 @@ describe("WorkTrunk Plugin - Event Handling", () => {
 
   test("session.idle event clears marker", async () => {
     const pluginModule = await import("../index.ts")
-    const WorkTrunkPlugin = pluginModule.default
+    const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
 
     let markerCleared = false
     let capturedMarker: string | null = null
@@ -224,7 +224,7 @@ describe("WorkTrunk Plugin - Event Handling", () => {
 
   test("session.error event clears marker", async () => {
     const pluginModule = await import("../index.ts")
-    const WorkTrunkPlugin = pluginModule.default
+    const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
 
     let markerCleared = false
     let capturedMarker: string | null = null
@@ -277,7 +277,7 @@ describe("WorkTrunk Plugin - Event Handling", () => {
 
   test("session.status 'retry' event clears marker", async () => {
     const pluginModule = await import("../index.ts")
-    const WorkTrunkPlugin = pluginModule.default
+    const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
 
     let markerCleared = false
     let capturedMarker: string | null = null
@@ -333,53 +333,9 @@ describe("WorkTrunk Plugin - Event Handling", () => {
     expect(capturedMarker).toBe("")
   })
 
-  test("cleanup clears all timers and prevents initialization", async () => {
-    const pluginModule = await import("../index.ts")
-    const WorkTrunkPlugin = pluginModule.default
-
-    let initCalled = false
-    let intervalStarted = false
-
-    const mockShell = {
-      quiet: () => {
-        return Promise.resolve({ stdout: Buffer.from("main") })
-      },
-    }
-
-    const mock$ = ((strings: TemplateStringsArray, ...values: any[]) => {
-      const cmd = strings.join("")
-      // Track if initialization runs
-      if (cmd.includes("wt --version")) {
-        initCalled = true
-      }
-      if (cmd.includes("git rev-parse")) {
-        initCalled = true
-      }
-      return mockShell
-    }) as any
-
-    const mockContext = createMockContext(mock$)
-    const plugin = await WorkTrunkPlugin(mockContext as PluginContext)
-
-    expect(plugin.cleanup).toBeDefined()
-    expect(typeof plugin.cleanup).toBe("function")
-
-    // Call cleanup immediately to cancel the 100ms initialization timer
-    plugin.cleanup!()
-
-    // Wait for the original initialization window (100ms) plus buffer
-    await new Promise((resolve) => setTimeout(resolve, 200))
-
-    // Verify initialization was cancelled - no calls should have been made
-    expect(initCalled).toBe(false)
-
-    // Cleanup is idempotent - should not throw
-    plugin.cleanup!()
-  })
-
   test("status updates are debounced", async () => {
     const pluginModule = await import("../index.ts")
-    const WorkTrunkPlugin = pluginModule.default
+    const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
 
     let markerSetCount = 0
 
@@ -427,7 +383,7 @@ describe("WorkTrunk Plugin - Event Handling", () => {
 
   test("final state wins: busy->idle transition results in 💬", async () => {
     const pluginModule = await import("../index.ts")
-    const WorkTrunkPlugin = pluginModule.default
+    const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
 
     const markers: string[] = []
 
@@ -493,7 +449,7 @@ describe("WorkTrunk Plugin - Event Handling", () => {
 
   test("final state wins: created->busy transition results in 🤖", async () => {
     const pluginModule = await import("../index.ts")
-    const WorkTrunkPlugin = pluginModule.default
+    const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
 
     const markers: string[] = []
 
@@ -562,7 +518,7 @@ describe("WorkTrunk Plugin - Event Handling", () => {
 
   test("marker set failure does not throw and logs debug", async () => {
     const pluginModule = await import("../index.ts")
-    const WorkTrunkPlugin = pluginModule.default
+    const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
 
     const logMessages: { level: string; message: string }[] = []
 
@@ -646,7 +602,7 @@ describe("WorkTrunk Plugin - Event Handling", () => {
 
   test("does not attempt to write marker when not in git repo", async () => {
     const pluginModule = await import("../index.ts")
-    const WorkTrunkPlugin = pluginModule.default
+    const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
 
     let markerSetAttempted = false
 

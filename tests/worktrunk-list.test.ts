@@ -10,7 +10,7 @@ describe("worktrunk-list tool", () => {
   test("worktrunk-list tool exists and has correct description", async () => {
     // This is a smoke test - verify the tool is properly exported
     const pluginModule = await import("../index.ts")
-    const WorkTrunkPlugin = pluginModule.default
+    const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
     
     const mockContext: Partial<PluginContext> = {
       $: mockShell as any,
@@ -26,12 +26,12 @@ describe("worktrunk-list tool", () => {
 
     const plugin = await WorkTrunkPlugin(mockContext as PluginContext)
     expect(plugin.tool).toBeDefined()
-    expect(plugin.tool["worktrunk-list"]).toBeDefined()
+    expect(plugin.tool.worktrunkList).toBeDefined()
   })
 
   test("worktrunk-list supports text format (default)", async () => {
     const pluginModule = await import("../index.ts")
-    const WorkTrunkPlugin = pluginModule.default
+    const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
     
     let capturedCommand: string[] = []
     const mockShell = {
@@ -58,7 +58,7 @@ describe("worktrunk-list tool", () => {
     }
 
     const plugin = await WorkTrunkPlugin(mockContext as PluginContext)
-    const listTool = plugin.tool["worktrunk-list"]
+    const listTool = plugin.tool.worktrunkList
     
     // Test with default (text) format
     const result = await listTool.execute({}, {} as any)
@@ -68,7 +68,7 @@ describe("worktrunk-list tool", () => {
 
   test("worktrunk-list supports json format", async () => {
     const pluginModule = await import("../index.ts")
-    const WorkTrunkPlugin = pluginModule.default
+    const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
     
     let capturedCommand: string[] = []
     const mockShell = {
@@ -95,7 +95,7 @@ describe("worktrunk-list tool", () => {
     }
 
     const plugin = await WorkTrunkPlugin(mockContext as PluginContext)
-    const listTool = plugin.tool["worktrunk-list"]
+    const listTool = plugin.tool.worktrunkList
     
     // Test with json format
     const result = await listTool.execute({ format: "json" }, {} as any)
@@ -109,7 +109,7 @@ describe("worktrunk-list tool", () => {
 
   test("worktrunk-list handles errors gracefully", async () => {
     const pluginModule = await import("../index.ts")
-    const WorkTrunkPlugin = pluginModule.default
+    const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
     
     const mockShell = {
       quiet: () => {
@@ -130,7 +130,7 @@ describe("worktrunk-list tool", () => {
     }
 
     const plugin = await WorkTrunkPlugin(mockContext as PluginContext)
-    const listTool = plugin.tool["worktrunk-list"]
+    const listTool = plugin.tool.worktrunkList
     
     const result = await listTool.execute({}, {} as any)
     expect(result).toContain("Error")

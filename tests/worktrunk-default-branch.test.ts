@@ -4,7 +4,7 @@ import type { PluginContext } from "@opencode-ai/plugin"
 describe("worktrunk-default-branch tool", () => {
   test("worktrunk-default-branch tool exists", async () => {
     const pluginModule = await import("../index.ts")
-    const WorkTrunkPlugin = pluginModule.default
+    const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
     
     const mockContext: Partial<PluginContext> = {
       $: (() => ({
@@ -21,12 +21,12 @@ describe("worktrunk-default-branch tool", () => {
     }
 
     const plugin = await WorkTrunkPlugin(mockContext as PluginContext)
-    expect(plugin.tool["worktrunk-default-branch"]).toBeDefined()
+    expect(plugin.tool.worktrunkDefaultBranch).toBeDefined()
   })
 
   test("worktrunk-default-branch returns default branch name", async () => {
     const pluginModule = await import("../index.ts")
-    const WorkTrunkPlugin = pluginModule.default
+    const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
     
     const mockContext: Partial<PluginContext> = {
       $: (() => ({
@@ -43,7 +43,7 @@ describe("worktrunk-default-branch tool", () => {
     }
 
     const plugin = await WorkTrunkPlugin(mockContext as PluginContext)
-    const defaultBranchTool = plugin.tool["worktrunk-default-branch"]
+    const defaultBranchTool = plugin.tool.worktrunkDefaultBranch
     
     const result = await defaultBranchTool.execute({}, {} as any)
     expect(result).toBe("main")
@@ -51,7 +51,7 @@ describe("worktrunk-default-branch tool", () => {
 
   test("worktrunk-default-branch handles master branch", async () => {
     const pluginModule = await import("../index.ts")
-    const WorkTrunkPlugin = pluginModule.default
+    const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
     
     const mockContext: Partial<PluginContext> = {
       $: (() => ({
@@ -68,7 +68,7 @@ describe("worktrunk-default-branch tool", () => {
     }
 
     const plugin = await WorkTrunkPlugin(mockContext as PluginContext)
-    const defaultBranchTool = plugin.tool["worktrunk-default-branch"]
+    const defaultBranchTool = plugin.tool.worktrunkDefaultBranch
     
     const result = await defaultBranchTool.execute({}, {} as any)
     expect(result).toBe("master")
@@ -76,7 +76,7 @@ describe("worktrunk-default-branch tool", () => {
 
   test("worktrunk-default-branch handles errors gracefully", async () => {
     const pluginModule = await import("../index.ts")
-    const WorkTrunkPlugin = pluginModule.default
+    const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
     
     const mockContext: Partial<PluginContext> = {
       $: (() => ({
@@ -93,7 +93,7 @@ describe("worktrunk-default-branch tool", () => {
     }
 
     const plugin = await WorkTrunkPlugin(mockContext as PluginContext)
-    const defaultBranchTool = plugin.tool["worktrunk-default-branch"]
+    const defaultBranchTool = plugin.tool.worktrunkDefaultBranch
     
     const result = await defaultBranchTool.execute({}, {} as any)
     expect(result).toContain("Error")
@@ -101,7 +101,7 @@ describe("worktrunk-default-branch tool", () => {
 
   test("worktrunk-default-branch handles empty output", async () => {
     const pluginModule = await import("../index.ts")
-    const WorkTrunkPlugin = pluginModule.default
+    const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
     
     const mockContext: Partial<PluginContext> = {
       $: (() => ({
@@ -118,7 +118,7 @@ describe("worktrunk-default-branch tool", () => {
     }
 
     const plugin = await WorkTrunkPlugin(mockContext as PluginContext)
-    const defaultBranchTool = plugin.tool["worktrunk-default-branch"]
+    const defaultBranchTool = plugin.tool.worktrunkDefaultBranch
     
     const result = await defaultBranchTool.execute({}, {} as any)
     expect(result).toContain("Unable to determine")

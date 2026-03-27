@@ -5,13 +5,8 @@
     "moduleResolution": "bundler",
     "strict": true,
     "esModuleInterop": true,
-    "skipLibCheck": true,
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "outDir": "dist",
-    "rootDir": "."
+    "skipLibCheck": true
   },
   "include": ["*.ts"],
-  "exclude": ["node_modules", "dist", "tests", "evals"]
+  "exclude": ["node_modules", "tests", "evals"]
 }

@@ -4,7 +4,7 @@ import type { PluginContext } from "@opencode-ai/plugin"
 describe("worktrunk-list CI monitoring", () => {
   test("worktrunk-list supports --full flag", async () => {
     const pluginModule = await import("../index.ts")
-    const WorkTrunkPlugin = pluginModule.default
+    const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
     
     let capturedCommand: string[] = []
     const mockContext: Partial<PluginContext> = {
@@ -25,7 +25,7 @@ describe("worktrunk-list CI monitoring", () => {
     }
 
     const plugin = await WorkTrunkPlugin(mockContext as PluginContext)
-    const listTool = plugin.tool["worktrunk-list"]
+    const listTool = plugin.tool.worktrunkList
     
     const result = await listTool.execute({ full: true }, {} as any)
     expect(result).toBeDefined()
@@ -35,7 +35,7 @@ describe("worktrunk-list CI monitoring", () => {
 
   test("worktrunk-list supports --branches flag", async () => {
     const pluginModule = await import("../index.ts")
-    const WorkTrunkPlugin = pluginModule.default
+    const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
     
     let capturedCommand: string[] = []
     const mockContext: Partial<PluginContext> = {
@@ -56,7 +56,7 @@ describe("worktrunk-list CI monitoring", () => {
     }
 
     const plugin = await WorkTrunkPlugin(mockContext as PluginContext)
-    const listTool = plugin.tool["worktrunk-list"]
+    const listTool = plugin.tool.worktrunkList
     
     const result = await listTool.execute({ branches: true }, {} as any)
     expect(result).toBeDefined()
@@ -66,7 +66,7 @@ describe("worktrunk-list CI monitoring", () => {
 
   test("worktrunk-list supports --full --branches together", async () => {
     const pluginModule = await import("../index.ts")
-    const WorkTrunkPlugin = pluginModule.default
+    const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
     
     let capturedCommand: string[] = []
     const mockContext: Partial<PluginContext> = {
@@ -89,7 +89,7 @@ describe("worktrunk-list CI monitoring", () => {
     }
 
     const plugin = await WorkTrunkPlugin(mockContext as PluginContext)
-    const listTool = plugin.tool["worktrunk-list"]
+    const listTool = plugin.tool.worktrunkList
     
     const result = await listTool.execute({ full: true, branches: true, format: "json" }, {} as any)
     expect(result).toBeDefined()

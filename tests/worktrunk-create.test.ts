@@ -4,7 +4,7 @@ import type { PluginContext } from "@opencode-ai/plugin"
 describe("worktrunk-create tool", () => {
   test("worktrunk-create tool exists", async () => {
     const pluginModule = await import("../index.ts")
-    const WorkTrunkPlugin = pluginModule.default
+    const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
     
     const mockContext: Partial<PluginContext> = {
       $: (() => ({
@@ -21,12 +21,12 @@ describe("worktrunk-create tool", () => {
     }
 
     const plugin = await WorkTrunkPlugin(mockContext as PluginContext)
-    expect(plugin.tool["worktrunk-create"]).toBeDefined()
+    expect(plugin.tool.worktrunkCreate).toBeDefined()
   })
 
   test("worktrunk-create creates branch without base", async () => {
     const pluginModule = await import("../index.ts")
-    const WorkTrunkPlugin = pluginModule.default
+    const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
     
     let capturedCommand: string[] = []
     const mockContext: Partial<PluginContext> = {
@@ -47,7 +47,7 @@ describe("worktrunk-create tool", () => {
     }
 
     const plugin = await WorkTrunkPlugin(mockContext as PluginContext)
-    const createTool = plugin.tool["worktrunk-create"]
+    const createTool = plugin.tool.worktrunkCreate
     
     const result = await createTool.execute({ branch: "feature/test" }, {} as any)
     expect(result).toBeDefined()
@@ -63,7 +63,7 @@ describe("worktrunk-create tool", () => {
 
   test("worktrunk-create creates stacked branch with base=@", async () => {
     const pluginModule = await import("../index.ts")
-    const WorkTrunkPlugin = pluginModule.default
+    const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
     
     let capturedCommand: string[] = []
     const mockContext: Partial<PluginContext> = {
@@ -84,7 +84,7 @@ describe("worktrunk-create tool", () => {
     }
 
     const plugin = await WorkTrunkPlugin(mockContext as PluginContext)
-    const createTool = plugin.tool["worktrunk-create"]
+    const createTool = plugin.tool.worktrunkCreate
     
     const result = await createTool.execute({ branch: "feature/part2", base: "@" }, {} as any)
     expect(result).toBeDefined()
@@ -99,7 +99,7 @@ describe("worktrunk-create tool", () => {
 
   test("worktrunk-create creates branch with custom base", async () => {
     const pluginModule = await import("../index.ts")
-    const WorkTrunkPlugin = pluginModule.default
+    const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
     
     let capturedCommand: string[] = []
     const mockContext: Partial<PluginContext> = {
@@ -120,7 +120,7 @@ describe("worktrunk-create tool", () => {
     }
 
     const plugin = await WorkTrunkPlugin(mockContext as PluginContext)
-    const createTool = plugin.tool["worktrunk-create"]
+    const createTool = plugin.tool.worktrunkCreate
     
     const result = await createTool.execute({ branch: "feature/part2", base: "feature/part1" }, {} as any)
     expect(result).toBeDefined()
@@ -135,7 +135,7 @@ describe("worktrunk-create tool", () => {
 
   test("worktrunk-create with skipHooks adds --no-verify flag", async () => {
     const pluginModule = await import("../index.ts")
-    const WorkTrunkPlugin = pluginModule.default
+    const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
     
     let capturedCommand: string[] = []
     const mockContext: Partial<PluginContext> = {
@@ -156,7 +156,7 @@ describe("worktrunk-create tool", () => {
     }
 
     const plugin = await WorkTrunkPlugin(mockContext as PluginContext)
-    const createTool = plugin.tool["worktrunk-create"]
+    const createTool = plugin.tool.worktrunkCreate
     
     const result = await createTool.execute({ branch: "feature/test", skipHooks: true }, {} as any)
     expect(result).toBeDefined()
@@ -168,7 +168,7 @@ describe("worktrunk-create tool", () => {
 
   test("worktrunk-create handles errors gracefully", async () => {
     const pluginModule = await import("../index.ts")
-    const WorkTrunkPlugin = pluginModule.default
+    const WorkTrunkPlugin = pluginModule.WorkTrunkPlugin
     
     const mockContext: Partial<PluginContext> = {
       $: (() => ({
@@ -185,7 +185,7 @@ describe("worktrunk-create tool", () => {
     }
 
     const plugin = await WorkTrunkPlugin(mockContext as PluginContext)
-    const createTool = plugin.tool["worktrunk-create"]
+    const createTool = plugin.tool.worktrunkCreate
     
     const result = await createTool.execute({ branch: "feature/test" }, {} as any)
     expect(result).toContain("Error")
