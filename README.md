@@ -389,3 +389,9 @@ opencode-worktrunk/
 ## License
 
 MIT
+
+This repository is a fork of [`edmundmiller/opencode-worktrunk`](https://github.com/edmundmiller/opencode-worktrunk).
+
+- The upstream project was marked as MIT licensed in its project metadata.
+- The upstream repository did not include a standalone `LICENSE` file at the time this fork was prepared.
+- This fork preserves attribution and continues distribution under MIT.
