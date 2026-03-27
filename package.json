@@ -1,9 +1,14 @@
 {
-  "name": "opencode-worktrunk",
-  "version": "1.0.0",
+  "name": "@qiyuanhuakai/opencode-worktrunk",
+  "version": "0.0.1",
   "description": "OpenCode plugin for WorkTrunk integration - tracks session state and updates status markers",
   "type": "module",
   "main": "./index.ts",
+  "files": [
+    "index.ts",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "test": "bun test",
     "eval": "opencode-eval run evals/",
