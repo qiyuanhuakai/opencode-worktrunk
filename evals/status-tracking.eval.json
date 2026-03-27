@@ -1,0 +1,82 @@
+{
+  "name": "worktrunk-status-tracking",
+  "description": "Test automatic status marker tracking (🤖 working, 💬 waiting)",
+  "dataset": {
+    "name": "status-tracking",
+    "examples": [
+      {
+        "id": "status-working",
+        "inputs": {
+          "query": "Use the worktrunk-list tool to list all worktrees"
+        }
+      },
+      {
+        "id": "status-waiting",
+        "inputs": {
+          "query": "What is the current WorkTrunk status?"
+        }
+      }
+    ]
+  },
+  "variants": {
+    "with-plugin": {
+      "plugins": ["opencode-worktrunk"]
+    },
+    "without-plugin": {
+      "plugins": []
+    }
+  },
+  "setup": {
+    "template": "empty",
+    "vcs": {
+      "git": {
+        "defaultBranch": "main",
+        "commits": [
+          {
+            "message": "Initial commit",
+            "files": {
+              "README.md": "# Test Project"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "evaluators": [
+    {
+      "type": "code",
+      "assertions": [
+        {
+          "type": "tool_called",
+          "tool": "worktrunk-list"
+        },
+        {
+          "type": "environment_state",
+          "check": "status_marker_present",
+          "marker": "🤖",
+          "description": "Status marker 🤖 is actually present in worktree status when working"
+        },
+        {
+          "type": "environment_state",
+          "check": "status_marker_present",
+          "marker": "💬",
+          "description": "Status marker 💬 is actually present in worktree status when waiting"
+        }
+      ]
+    },
+    {
+      "type": "llm-judge",
+      "criteria": [
+        "Status markers are actually set in the WorkTrunk environment (verified, not just tool called)",
+        "Status markers appear correctly in worktree status output",
+        "Status tracking works automatically without manual intervention",
+        "Status markers reflect the actual state of the OpenCode session"
+      ],
+      "reference_free": true
+    }
+  ],
+  "error_handling": {
+    "on_error": "continue",
+    "timeout_ms": 120000
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "name": "worktrunk-remove-tool",
+  "description": "Test worktrunk-remove tool for removing worktrees",
+  "dataset": {
+    "name": "remove-tool",
+    "examples": [
+      {
+        "id": "remove-branch",
+        "inputs": {
+          "query": "Remove the worktree for branch 'feature/test' using worktrunk-remove"
+        }
+      },
+      {
+        "id": "remove-current",
+        "inputs": {
+          "query": "Remove the current worktree using '@' shortcut with worktrunk-remove"
+        }
+      }
+    ]
+  },
+  "variants": {
+    "with-plugin": {
+      "plugins": ["opencode-worktrunk"]
+    }
+  },
+  "setup": {
+    "template": "empty",
+    "vcs": {
+      "git": {
+        "defaultBranch": "main",
+        "commits": [
+          {
+            "message": "Initial commit",
+            "files": {
+              "README.md": "# Test Project"
+            }
+          }
+        ],
+        "branches": ["feature/test", "bugfix/issue-1"]
+      }
+    }
+  },
+  "evaluators": [
+    {
+      "type": "code",
+      "assertions": [
+        {
+          "type": "tool_called",
+          "tool": "worktrunk-remove"
+        },
+        {
+          "type": "environment_state",
+          "check": "worktree_removed",
+          "branch": "feature/test",
+          "description": "Worktree for feature/test is actually removed from the environment"
+        },
+        {
+          "type": "environment_state",
+          "check": "worktree_not_exists",
+          "branch": "feature/test",
+          "description": "Worktree no longer exists after removal (verified in environment)"
+        }
+      ]
+    },
+    {
+      "type": "llm-judge",
+      "criteria": [
+        "Worktree removal actually executes successfully and removes the worktree (verified, not just tool called)",
+        "Removed worktrees are actually cleaned up from the filesystem and git worktree list",
+        "Tool handles errors gracefully (e.g., removing non-existent worktree)",
+        "Worktree removal produces the expected outcome in the environment"
+      ],
+      "reference_free": true
+    }
+  ],
+  "error_handling": {
+    "on_error": "continue",
+    "timeout_ms": 120000
+  }
+}
