@@ -1,10 +1,17 @@
 > 说明：  
 > 本项目基于上游仓库 [`edmundmiller/opencode-worktrunk`](https://github.com/edmundmiller/opencode-worktrunk) 的 fork 进行维护。  
 > 上游项目在README中声明为 MIT 许可，但当本 fork 创建时，上游仓库未提供单独的 `LICENSE` 文件。  
-> 本仓库在保留原项目归属信息的前提下，补充许可证文件，并继续提供修复与分发支持。
+> 本仓库在保留原项目归属信息的前提下，继续提供修复与分发支持。
 >
 > This repository is a maintained fork of the original upstream project and continues distribution under MIT with attribution preserved.
-
+## 注意 Notice
+由于OpenCode更新了引入插件的方式，源仓库给出的引入方法已经失效，现在的正确做法是在`~/.config/opencode/opencode.json`中添加：
+Since OpenCode has updated its method for introducing plugins, the approach provided by the source repository is now obsolete. The correct procedure is to add the following to `~/.config/opencode/opencode.json`:
+```
+{
+   "plugins":["opencode-worktrunk@git+https://github.com/qiyuanhuakai/opencode-worktrunk"]
+}
+```
 # OpenCode WorkTrunk Plugin
 
 An OpenCode plugin that integrates with [WorkTrunk](https://worktrunk.dev/) to track session state and update status markers automatically.
